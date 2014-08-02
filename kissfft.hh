@@ -264,24 +264,24 @@ class kissfft
             cpx_type * twiddles = &_twiddles[0];
             cpx_type t;
             int Norig = _nfft;
-            cpx_type scratchbuf[p];
 
+            _scratchbuf.resize(p);
             for ( u=0; u<m; ++u ) {
                 k=u;
                 for ( q1=0 ; q1<p ; ++q1 ) {
-                    scratchbuf[q1] = Fout[ k  ];
-                    C_FIXDIV(scratchbuf[q1],p);
+                    _scratchbuf[q1] = Fout[ k  ];
+                    C_FIXDIV(_scratchbuf[q1],p);
                     k += m;
                 }
 
                 k=u;
                 for ( q1=0 ; q1<p ; ++q1 ) {
                     int twidx=0;
-                    Fout[ k ] = scratchbuf[0];
+                    Fout[ k ] = _scratchbuf[0];
                     for (q=1;q<p;++q ) {
                         twidx += fstride * k;
                         if (twidx>=Norig) twidx-=Norig;
-                        C_MUL(t,scratchbuf[q] , twiddles[twidx] );
+                        C_MUL(t,_scratchbuf[q] , twiddles[twidx] );
                         C_ADDTO( Fout[ k ] ,t);
                     }
                     k += m;
@@ -295,5 +295,6 @@ class kissfft
         std::vector<int> _stageRadix;
         std::vector<int> _stageRemainder;
         traits_type _traits;
+        std::vector<cpx_type> _scratchbuf;
 };
 #endif
